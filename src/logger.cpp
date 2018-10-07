@@ -72,6 +72,13 @@ void Logger::log_to_file(const std::string& base_file_name, const std::string& c
                         base_file_name + "-" + get_random_string(8) + "_" +
                         std::to_string(file_id) + ".log");
                 f << content;
+                // some cpu-expensive work
+                /*
+                int result = 0;
+                for(int i = 0; i < static_cast<int>(content.size()); i++)
+                    for(int j = 0; j < 100; j++)
+                        result += static_cast<int>(content[i]);
+                */
                 f.close();
                 file_statistics[file_id].num_blocks++;
                 file_statistics[file_id].num_commands += num_elements;
