@@ -9,10 +9,15 @@
 class CommandAccumulator {
 public:
     void add_command(const std::string& command);
+
     void clear();
+
     void log_commands();
+
     void log_commands_and_clear();
+
     size_t size();
+
     bool empty();
 
 private:

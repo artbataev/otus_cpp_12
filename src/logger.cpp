@@ -2,8 +2,8 @@
 #include <string>
 
 void Logger::task_runner(std::mutex& tasks_mutex,
-                 std::condition_variable& condition,
-                 std::queue<std::function<void()>>& tasks) {
+                         std::condition_variable& condition,
+                         std::queue<std::function<void()>>& tasks) {
     while (true) {
         std::function<void()> task;
         {
@@ -69,8 +69,6 @@ void Logger::log_to_file(const std::string& base_file_name, const std::string& c
                         std::to_string(file_id) + ".log");
                 f << content;
                 f.close();
-                file_statistics[file_id].num_blocks++;
-                file_statistics[file_id].num_commands += num_elements;
             });
         }
         file_tasks_condition.notify_one();
@@ -79,8 +77,9 @@ void Logger::log_to_file(const std::string& base_file_name, const std::string& c
 
 void Logger::finalize_and_print_statistics(std::ostream& output_stream) {
     end_work(); // join all threads to avoid incorrect numbers
-    output_stream << "log thread - ";
-    output_stream << cout_statistics.num_blocks << " blocks, " << cout_statistics.num_commands << " commands" << std::endl;
+    output_stream << "log thread - "
+                  << cout_statistics.num_blocks << " blocks, "
+                  << cout_statistics.num_commands << " commands" << std::endl;
 
     for (int file_id = 1; file_id <= filewriters_pool.size(); file_id++) {
         output_stream << "file" << file_id << " thread - "
@@ -96,7 +95,7 @@ void Logger::end_work() {
     if (stdout_thread != nullptr && stdout_thread->joinable())
         stdout_thread->join();
     for (auto& t: filewriters_pool)
-        if(t.joinable())
+        if (t.joinable())
             t.join();
     filewriters_pool.resize(0);
     stdout_thread = nullptr;

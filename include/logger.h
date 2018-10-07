@@ -28,16 +28,20 @@ public:
                      std::queue<std::function<void()>>& tasks);
 
     void reserve_thread_for_stdout();
+
     void add_threads_for_filewriters(int n);
 
     void log_to_cout(const std::string& content, size_t num_elements);
-    void log_to_file(const std::string& base_file_name, const std::string& content,size_t num_elements);
+
+    void log_to_file(const std::string& base_file_name, const std::string& content, size_t num_elements);
 
     void finalize_and_print_statistics(std::ostream& output_stream);
 
 private:
     Logger() = default;
+
     void end_work();
+
     ~Logger();
 
     struct Statistics {

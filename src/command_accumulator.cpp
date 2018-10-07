@@ -21,7 +21,7 @@ void CommandAccumulator::log_commands() {
     std::ostringstream ss;
     ss << "bulk: ";
     for (size_t i = 0; i < commands.size(); i++) {
-        if(i > 0)
+        if (i > 0)
             ss << ", ";
         ss << commands[i];
     }

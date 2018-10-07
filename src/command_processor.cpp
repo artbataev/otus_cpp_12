@@ -38,6 +38,8 @@ void CommandProcessor::process_commands(std::istream& source_stream) {
 }
 
 void CommandProcessor::print_statistics(std::ostream& output_stream) {
-    output_stream << "main thread - " <<  total_lines << " lines, ";
-    output_stream << total_commands << " commands, " << total_blocks << " blocks" << std::endl;
+    output_stream << "main thread - "
+                  << total_lines << " lines, "
+                  << total_commands << " commands, "
+                  << total_blocks << " blocks" << std::endl;
 }
