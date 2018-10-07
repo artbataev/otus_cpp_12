@@ -8,8 +8,14 @@ endif()
 
 set(CMAKE_CXX_STANDARD 17)
 
-#include_directories("${PROJECT_SOURCE_DIR}/include")
+include_directories("${PROJECT_SOURCE_DIR}/include")
+
+add_library(logger src/logger.cpp include/logger.h)
+add_library(command src/command_processor.cpp src/command_accumulator.cpp
+        include/command_processor.h include/command_accumulator.h)
+target_link_libraries(command logger)
 add_executable(bulkmt src/main.cpp)
+target_link_libraries(bulkmt logger command)
 
 install(TARGETS bulkmt RUNTIME DESTINATION bin)
 
