@@ -1,5 +1,6 @@
 #include "logger.h"
 #include <string>
+#include <fstream>
 
 void Logger::task_runner(std::mutex& tasks_mutex,
                          std::condition_variable& condition,

@@ -1,9 +1,7 @@
 #pragma once
 
 #include <iostream>
-#include <fstream>
 #include <map>
-#include <string>
 #include <vector>
 #include <thread>
 #include <queue>
@@ -11,6 +9,7 @@
 #include <mutex>
 #include <atomic>
 #include <condition_variable>
+#include <functional>
 
 
 class Logger {
