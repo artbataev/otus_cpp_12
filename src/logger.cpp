@@ -23,6 +23,7 @@ void Logger::task_runner(std::mutex& tasks_mutex,
 }
 
 void Logger::reserve_thread_for_stdout() {
+    use_cout_thread = true;
     if (stdout_thread == nullptr) {
         stdout_thread = std::make_unique<std::thread>([&] {
             this->task_runner(cout_tasks_mutex, cout_tasks_condition, cout_tasks);
@@ -35,8 +36,9 @@ void Logger::add_threads_for_filewriters(int n) {
         filewriters_pool.emplace_back(std::thread([&] {
             this->task_runner(file_tasks_mutex, file_tasks_condition, file_tasks);
         }));
-        filewriters_pool_ids[filewriters_pool[i].get_id()] = i + 1; // file1, file2 etc.
+        filewriters_pool_ids[filewriters_pool[num_file_threads + i].get_id()] = num_file_threads + i + 1; // file1, file2 etc.
     }
+    num_file_threads += n;
 }
 
 void Logger::log_to_cout(const std::string& content, size_t num_elements) {
@@ -70,38 +72,57 @@ void Logger::log_to_file(const std::string& base_file_name, const std::string& c
                         std::to_string(file_id) + ".log");
                 f << content;
                 f.close();
+                file_statistics[file_id].num_blocks++;
+                file_statistics[file_id].num_commands += num_elements;
             });
         }
         file_tasks_condition.notify_one();
     }
 }
 
-void Logger::finalize_and_print_statistics(std::ostream& output_stream) {
-    end_work(); // join all threads to avoid incorrect numbers
+void Logger::finalize_and_print_statistics(std::ostream& output_stream, bool resume = true) {
+    suspend_work(); // join all threads to avoid incorrect numbers
     output_stream << "log thread - "
                   << cout_statistics.num_blocks << " blocks, "
                   << cout_statistics.num_commands << " commands" << std::endl;
 
-    for (int file_id = 1; file_id <= filewriters_pool.size(); file_id++) {
+    for (int file_id = 1; file_id <= num_file_threads; file_id++) {
         output_stream << "file" << file_id << " thread - "
                       << file_statistics[file_id].num_blocks << " blocks, "
                       << file_statistics[file_id].num_commands << " commands" << std::endl;
     }
+    if (resume)
+        resume_work();
 }
 
-void Logger::end_work() {
-    working = false;
-    file_tasks_condition.notify_all();
-    cout_tasks_condition.notify_all();
-    if (stdout_thread != nullptr && stdout_thread->joinable())
-        stdout_thread->join();
-    for (auto& t: filewriters_pool)
-        if (t.joinable())
-            t.join();
-    filewriters_pool.resize(0);
-    stdout_thread = nullptr;
+void Logger::suspend_work() {
+    if (working) {
+        working = false;
+        file_tasks_condition.notify_all();
+        cout_tasks_condition.notify_all();
+        if (stdout_thread != nullptr && stdout_thread->joinable())
+            stdout_thread->join();
+        for (auto& t: filewriters_pool)
+            if (t.joinable())
+                t.join();
+        filewriters_pool.resize(0);
+        stdout_thread = nullptr;
+    }
+}
+
+void Logger::resume_work() {
+    if (!working) {
+        if (use_cout_thread)
+            reserve_thread_for_stdout();
+        if (num_file_threads > 0) {
+            auto need_threads = num_file_threads;
+            num_file_threads = 0;
+            add_threads_for_filewriters(need_threads);
+        }
+        working = true;
+    }
 }
 
 Logger::~Logger() {
-    end_work();
+    suspend_work();
 };

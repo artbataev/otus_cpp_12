@@ -35,12 +35,13 @@ public:
 
     void log_to_file(const std::string& base_file_name, const std::string& content, size_t num_elements);
 
-    void finalize_and_print_statistics(std::ostream& output_stream);
+    void finalize_and_print_statistics(std::ostream& output_stream, bool resume);
 
 private:
     Logger() = default;
 
-    void end_work();
+    void suspend_work();
+    void resume_work();
 
     ~Logger();
 
@@ -48,6 +49,9 @@ private:
         std::atomic<int> num_blocks = 0;
         std::atomic<int> num_commands = 0;
     };
+
+    bool use_cout_thread = false;
+    int num_file_threads = 0;
 
     std::vector<std::thread> filewriters_pool;
     std::map<decltype(std::this_thread::get_id()), int> filewriters_pool_ids;

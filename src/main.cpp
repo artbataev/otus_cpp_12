@@ -42,6 +42,6 @@ int main(int argc, char *argv[]) {
     processor.process_commands(source_stream);
 
     processor.print_statistics(std::cout);
-    Logger::get_logger().finalize_and_print_statistics(std::cout);
+    Logger::get_logger().finalize_and_print_statistics(std::cout, /*resume=*/false);
     return 0;
 }
