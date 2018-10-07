@@ -82,9 +82,10 @@ void Logger::finalize_and_print_statistics(std::ostream& output_stream) {
     output_stream << "log thread - ";
     output_stream << cout_statistics.num_blocks << " blocks, " << cout_statistics.num_commands << " commands" << std::endl;
 
-    for(const auto&[file_id, stat]: file_statistics) {
-        output_stream << "file" << file_id << " thread - ";
-        output_stream << stat.num_blocks << " blocks, " << stat.num_commands << " commands" << std::endl;
+    for (int file_id = 1; file_id <= filewriters_pool.size(); file_id++) {
+        output_stream << "file" << file_id << " thread - "
+                      << file_statistics[file_id].num_blocks << " blocks, "
+                      << file_statistics[file_id].num_commands << " commands" << std::endl;
     }
 }
 
