@@ -1,6 +1,7 @@
 #include "logger.h"
 #include <string>
 #include <fstream>
+#include <cstdlib>
 
 void Logger::task_runner(std::mutex& tasks_mutex,
                          std::condition_variable& condition,
@@ -68,7 +69,7 @@ void Logger::log_to_file(const std::string& base_file_name, const std::string& c
             file_tasks.push([&, base_file_name, content, num_elements] {
                 auto file_id = filewriters_pool_ids[std::this_thread::get_id()];
                 std::ofstream f(
-                        base_file_name + "_" +
+                        base_file_name + "-" + get_random_string(8) + "_" +
                         std::to_string(file_id) + ".log");
                 f << content;
                 f.close();
@@ -121,6 +122,15 @@ void Logger::resume_work() {
         }
         working = true;
     }
+}
+
+std::string Logger::get_random_string(int len) {
+    static const std::string alphanum = "0123456789abcdefghijklmnopqrstuvwxyz";
+    std::string result;
+    for(int i = 0; i < len; i++) {
+        result += alphanum[rand() % alphanum.size()];
+    }
+    return result;
 }
 
 Logger::~Logger() {

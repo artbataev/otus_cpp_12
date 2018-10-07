@@ -1,15 +1,20 @@
 #pragma once
 
 #include <iostream>
-#include <map>
-#include <vector>
-#include <thread>
-#include <queue>
 #include <sstream>
-#include <mutex>
-#include <atomic>
-#include <condition_variable>
+
+#include <vector>
+#include <string>
+#include <map>
+#include <queue>
+
 #include <functional>
+
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+#include <atomic>
+
 
 
 class Logger {
@@ -42,6 +47,8 @@ private:
 
     void suspend_work();
     void resume_work();
+
+    std::string get_random_string(int len);
 
     ~Logger();
 
