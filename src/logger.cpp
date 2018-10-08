@@ -60,7 +60,7 @@ void Logger::log_to_cout(const std::string& content, size_t num_elements) {
 
 void Logger::log_to_file(const std::string& base_file_name, const std::string& content, size_t num_elements) {
     if (filewriters_pool.empty()) {
-        std::ofstream f(base_file_name + ".log");
+        std::ofstream f(base_file_name + "-" + get_random_string(8)+ ".log");
         f << content;
         f.close();
     } else {
@@ -88,8 +88,7 @@ void Logger::log_to_file(const std::string& base_file_name, const std::string& c
     }
 }
 
-void Logger::finalize_and_print_statistics(std::ostream& output_stream, bool resume = true) {
-    suspend_work(); // join all threads to avoid incorrect numbers
+void Logger::print_statistics(std::ostream& output_stream) {
     output_stream << "log thread - "
                   << cout_statistics.num_blocks << " blocks, "
                   << cout_statistics.num_commands << " commands" << std::endl;
@@ -99,8 +98,6 @@ void Logger::finalize_and_print_statistics(std::ostream& output_stream, bool res
                       << file_statistics[file_id].num_blocks << " blocks, "
                       << file_statistics[file_id].num_commands << " commands" << std::endl;
     }
-    if (resume)
-        resume_work();
 }
 
 void Logger::suspend_work() {

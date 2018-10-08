@@ -35,7 +35,11 @@ TEST_P(AssignmentTestFromFile, AssignmentExample) {
 
     testing::internal::CaptureStdout();
     processor.process_commands(test_input);
+    if (GetParam().use_separate_thread_for_cout)
+        Logger::get_logger().suspend_work();
     std::string output = testing::internal::GetCapturedStdout();
+    if (GetParam().use_separate_thread_for_cout)
+        Logger::get_logger().resume_work();
 
     ASSERT_EQ(output, test_output_etalon_stream.str());
 }
@@ -56,6 +60,7 @@ INSTANTIATE_TEST_CASE_P(MyGroup, AssignmentTestFromFile, ::testing::Values(
         TestParams{2,
                    PROJECT_SOURCE_DIR + "/test/data/test5.in.txt"s,
                    PROJECT_SOURCE_DIR + "/test/data/test5.out.txt"s}, // output all before first bracket
+//         tests for separated thread for cout
         TestParams{3,
                    PROJECT_SOURCE_DIR + "/test/data/test1.in.txt"s,
                    PROJECT_SOURCE_DIR + "/test/data/test1.out.txt"s,
@@ -76,7 +81,6 @@ INSTANTIATE_TEST_CASE_P(MyGroup, AssignmentTestFromFile, ::testing::Values(
                    PROJECT_SOURCE_DIR + "/test/data/test5.in.txt"s,
                    PROJECT_SOURCE_DIR + "/test/data/test5.out.txt"s,
                    true} // output all before first bracket
-
 ));
 
 int main(int argc, char **argv) {

@@ -40,13 +40,13 @@ public:
 
     void log_to_file(const std::string& base_file_name, const std::string& content, size_t num_elements);
 
-    void finalize_and_print_statistics(std::ostream& output_stream, bool resume);
-
-private:
-    Logger() = default;
+    void print_statistics(std::ostream& output_stream);
 
     void suspend_work();
     void resume_work();
+
+private:
+    Logger() = default;
 
     std::string get_random_string(int len);
 

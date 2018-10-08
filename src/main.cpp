@@ -55,7 +55,8 @@ int main(int argc, char *argv[]) {
     CommandProcessor processor(num_commands_in_bulk);
     processor.process_commands(source_stream);
 
-    Logger::get_logger().finalize_and_print_statistics(std::cout, /*resume=*/false);
+    Logger::get_logger().suspend_work(); // suspend all threads before printing statistics
     processor.print_statistics(std::cout);
+    Logger::get_logger().print_statistics(std::cout);
     return 0;
 }
