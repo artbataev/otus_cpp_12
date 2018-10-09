@@ -25,8 +25,6 @@ private:
     long long int bulk_first_command_time = 0;
 
     static std::string get_log_file_basename(long long int first_command_time) {
-        std::stringstream ss;
-        ss << "bulk" << first_command_time;
-        return ss.str();
+        return "bulk" + std::to_string(first_command_time);
     }
 };
