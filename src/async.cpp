@@ -20,6 +20,14 @@ namespace async {
     void reserve_threads_for_tasks(std::size_t num_threads) {
         impl::CommandProcessorsRouter::get_router().reserve_threads(num_threads);
     }
+
+    void stop_all_tasks() {
+        impl::CommandProcessorsRouter::get_router().stop_thread_pool();
+    }
+
+    void resume_tasks() {
+        impl::CommandProcessorsRouter::get_router().resume_thread_pool();
+    }
 }
 
 namespace async::impl {
@@ -61,5 +69,13 @@ namespace async::impl {
         if(num_threads > 0) {
             thread_pool.configure_threads(num_threads);
         }
+    }
+
+    void CommandProcessorsRouter::stop_thread_pool() {
+        thread_pool.suspend_work();
+    }
+
+    void CommandProcessorsRouter::resume_thread_pool() {
+        thread_pool.resume_work();
     }
 }

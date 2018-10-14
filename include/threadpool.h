@@ -10,7 +10,11 @@ class ThreadPool {
 public:
     void add_task(const std::function<void()>& task);
 
-    void configure_threads(size_t num_threads);
+    void configure_threads(size_t num_threads_);
+
+    void suspend_work();
+
+    void resume_work();
 
     ~ThreadPool();
 
@@ -19,7 +23,8 @@ private:
                      std::condition_variable& condition,
                      std::queue<std::function<void()>>& tasks);
 
-    bool working = true;
+    bool working = false;
+    size_t num_threads;
 
     std::vector<std::thread> pool;
     std::queue<std::function<void()>> tasks;

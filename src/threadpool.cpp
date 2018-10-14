@@ -8,27 +8,36 @@ void ThreadPool::add_task(const std::function<void()>& task) {
     tasks_condition.notify_one();
 }
 
-void ThreadPool::configure_threads(size_t num_threads) {
-    working = false;
-    tasks_condition.notify_all();
-    for (auto& t: pool)
-        if (t.joinable())
-            t.join();
-    pool.resize(0);
-    for (int _ = 0; _ < num_threads; _++) {
-        pool.emplace_back(std::thread([&] {
-            this->task_runner(tasks_mutex, tasks_condition, tasks);
-        }));
+void ThreadPool::configure_threads(size_t num_threads_) {
+    suspend_work();
+    num_threads = num_threads_;
+    resume_work();
+}
+
+void ThreadPool::suspend_work() {
+    if (working) {
+        working = false;
+        tasks_condition.notify_all();
+        for (auto& t: pool)
+            if (t.joinable())
+                t.join();
     }
-    working = true;
+    pool.resize(0);
+}
+
+void ThreadPool::resume_work() {
+    if (!working) {
+        for (int _ = 0; _ < num_threads; _++) {
+            pool.emplace_back(std::thread([&] {
+                this->task_runner(tasks_mutex, tasks_condition, tasks);
+            }));
+        }
+        working = true;
+    }
 }
 
 ThreadPool::~ThreadPool() {
-    working = false;
-    tasks_condition.notify_all();
-    for (auto& t: pool)
-        if (t.joinable())
-            t.join();
+   suspend_work();
 }
 
 void ThreadPool::task_runner(std::mutex& tasks_mutex,
