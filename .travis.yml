@@ -31,6 +31,6 @@ deploy:
   provider: script
   skip_cleanup: true
   script:
-  - curl -T bulkmt-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb -u artbataev:$BINTRAY_API_KEY "https://api.bintray.com/content/artbataev1/Otus_Assignments/Otus_Cpp_10/$TRAVIS_BUILD_NUMBER/bulkmt-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb;publish=1"
+  - curl -T async-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb -u artbataev:$BINTRAY_API_KEY "https://api.bintray.com/content/artbataev1/Otus_Assignments/Otus_Cpp_11/$TRAVIS_BUILD_NUMBER/async-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb;publish=1"
   on:
     branch: master
