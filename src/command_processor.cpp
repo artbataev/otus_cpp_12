@@ -57,6 +57,8 @@ void CommandProcessor::process_commands(std::istream& source_stream, bool clear_
 }
 
 void CommandProcessor::print_statistics(std::ostream& output_stream) {
+    std::lock_guard<std::mutex> guard{data_mutex};
+    std::lock_guard<std::mutex> guard2{process_mutex};
     output_stream << "main thread - "
                   << total_lines << " lines, "
                   << total_commands << " commands, "
