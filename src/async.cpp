@@ -4,27 +4,62 @@
 namespace async {
 
     handle_t connect(std::size_t bulk) {
-        handle_t bulk_handle = nullptr;
+        handle_t bulk_handle;
         bulk_handle = impl::CommandProcessorsRouter::get_router().create_new_processor(bulk);
         return bulk_handle;
     }
 
     void receive(handle_t handle, const char *data, std::size_t size) {
-        static_cast<CommandProcessor*>(handle)->process_data(data, size);
+        impl::CommandProcessorsRouter::get_router().run_processor(handle, data, size);
     }
 
     void disconnect(handle_t handle) {
         impl::CommandProcessorsRouter::get_router().remove_processor(handle);
     }
+
+    void reserve_threads_for_tasks(std::size_t num_threads) {
+        impl::CommandProcessorsRouter::get_router().reserve_threads(num_threads);
+    }
 }
 
 namespace async::impl {
+    CommandProcessorsRouter::CommandProcessorsRouter() {
+        auto hardware_threads = std::thread::hardware_concurrency();
+        if (hardware_threads > 0)
+            thread_pool.configure_threads(hardware_threads);
+        else
+            thread_pool.configure_threads(1);
+    }
+
     handle_t CommandProcessorsRouter::create_new_processor(std::size_t bulk) {
-        return new CommandProcessor(bulk);
+        auto processor = new CommandProcessor(static_cast<int>(bulk));
+        std::shared_ptr<CommandProcessor> processor_shared(processor);
+        {
+            std::lock_guard<std::mutex> guard{inner_data_mutex};
+            handles[processor] = processor_shared;
+        }
+        return processor;
+    }
+
+    void CommandProcessorsRouter::run_processor(handle_t handle, const char *data, std::size_t size) {
+        std::lock_guard<std::mutex> guard{inner_data_mutex};
+        if(handles.count(handle) > 0){
+            auto processor = handles[handle];
+            std::string data_str(data, size);
+            thread_pool.add_task([processor, data_str, size]{ processor->process_data(data_str, size); });
+        }
     }
 
     void CommandProcessorsRouter::remove_processor(handle_t handle) {
-
+        std::lock_guard<std::mutex> guard{inner_data_mutex};
+        if(handles.count(handle) > 0) {
+            handles.erase(handle);
+        }
     }
 
+    void CommandProcessorsRouter::reserve_threads(std::size_t num_threads) {
+        if(num_threads > 0) {
+            thread_pool.configure_threads(num_threads);
+        }
+    }
 }

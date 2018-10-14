@@ -1,8 +1,10 @@
 #pragma once
 
 #include <cstddef>
-#include <unordered_set>
+#include <unordered_map>
+#include <mutex>
 #include "command_processor.h"
+#include "threadpool.h"
 
 namespace async {
 
@@ -13,6 +15,8 @@ namespace async {
     void receive(handle_t handle, const char *data, std::size_t size);
 
     void disconnect(handle_t handle);
+
+    void reserve_threads_for_tasks(std::size_t num_threads);
 
 }
 
@@ -26,8 +30,14 @@ namespace async::impl {
 
         handle_t create_new_processor(std::size_t bulk);
         void remove_processor(handle_t handle);
+        void run_processor(handle_t handle, const char *data, std::size_t size);
+        void reserve_threads(std::size_t num_threads);
 
     private:
-        std::unordered_set<void*> handles;
+        CommandProcessorsRouter();
+
+        std::unordered_map<handle_t, std::shared_ptr<CommandProcessor>> handles;
+        std::mutex inner_data_mutex;
+        ThreadPool thread_pool;
     };
 }
