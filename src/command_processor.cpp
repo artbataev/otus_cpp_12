@@ -4,11 +4,12 @@
 
 CommandProcessor::CommandProcessor(int num_commands_in_bulk_) : num_commands_in_bulk(num_commands_in_bulk_) {}
 
-void CommandProcessor::process_data(const char *data, std::size_t size) {
-    buffer.append(data, size);
+void CommandProcessor::process_data(const std::string& data, std::size_t size) {
+    std::lock_guard<std::mutex> guard{data_mutex};
+    buffer.append(data, 0, size);
     const auto last_newline_pos = buffer.rfind('\n');
 
-    if(last_newline_pos != std::string::npos) {
+    if (last_newline_pos != std::string::npos) {
         std::istringstream ss(buffer.substr(0, last_newline_pos + 1));
         process_commands(ss, /*clear_after_end=*/false);
         buffer.erase(0, last_newline_pos + 1);
@@ -41,6 +42,7 @@ void CommandProcessor::process_1_command(const std::string& current_command) {
 }
 
 void CommandProcessor::process_commands(std::istream& source_stream, bool clear_after_end) {
+    std::lock_guard<std::mutex> guard{process_mutex};
     std::string current_command;
 
     while (getline(source_stream, current_command)) {
