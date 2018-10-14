@@ -12,8 +12,12 @@ include_directories("${PROJECT_SOURCE_DIR}/include")
 include_directories(${CMAKE_BINARY_DIR})
 
 add_library(logger src/logger.cpp include/logger.h)
+set_property(TARGET logger PROPERTY POSITION_INDEPENDENT_CODE ON)
+
 add_library(command src/command_processor.cpp src/command_accumulator.cpp
         include/command_processor.h include/command_accumulator.h)
+set_property(TARGET command PROPERTY POSITION_INDEPENDENT_CODE ON)
+
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     target_link_libraries(logger pthread)
 endif()
