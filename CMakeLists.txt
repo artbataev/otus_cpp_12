@@ -19,6 +19,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 endif()
 
 add_library(async SHARED src/async.cpp include/async.h)
+set_property(TARGET async PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_link_libraries(async command logger)
 
 add_executable(async_cli src/main.cpp)
