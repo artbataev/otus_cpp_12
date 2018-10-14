@@ -4,17 +4,27 @@
 namespace async {
 
     handle_t connect(std::size_t bulk) {
-        handle_t bulk_handle;
-        bulk_handle = CommandProcessor::get_processor().create_connection(bulk);
+        handle_t bulk_handle = nullptr;
+        bulk_handle = impl::CommandProcessorsRouter::get_router().create_new_processor(bulk);
         return bulk_handle;
     }
 
     void receive(handle_t handle, const char *data, std::size_t size) {
-        CommandProcessor::get_processor().process_data(handle, data, size);
+        static_cast<CommandProcessor*>(handle)->process_data(data, size);
     }
 
     void disconnect(handle_t handle) {
-        CommandProcessor::get_processor().destroy_connection(handle);
+        impl::CommandProcessorsRouter::get_router().remove_processor(handle);
+    }
+}
+
+namespace async::impl {
+    handle_t CommandProcessorsRouter::create_new_processor(std::size_t bulk) {
+        return new CommandProcessor(bulk);
+    }
+
+    void CommandProcessorsRouter::remove_processor(handle_t handle) {
+
     }
 
 }

@@ -8,23 +8,18 @@
 
 class CommandProcessor {
 public:
-//    explicit CommandProcessor(int num_commands_in_bulk_);
-    static CommandProcessor& get_processor() {
-        static CommandProcessor processor;
-        return processor;
-    }
+    explicit CommandProcessor(int num_commands_in_bulk_);
+    void process_data(const char *data, std::size_t size);
 
-    void* create_connection(size_t bulk);
-    void destroy_connection(void* connection);
-
-    void process_data(void* connection, const char *data, std::size_t size);
-
-    void process_commands(std::istream& source_stream);
+    void process_commands(std::istream& source_stream, bool clear_after_end=true);
 
     void print_statistics(std::ostream& output_stream);
 
 private:
+    void process_1_command(const std::string& command);
+
     CommandAccumulator accumulator;
+    std::string buffer;
     int num_brackets = 0;
     int num_commands_in_bulk = 0;
     int total_lines = 0;
