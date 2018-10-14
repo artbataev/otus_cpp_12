@@ -2,8 +2,7 @@
 #include <fstream>
 #include <sstream>
 
-//#include "logger.h"
-//#include "command_processor.h"
+#include "logger.h"
 #include "async.h"
 
 
@@ -49,16 +48,8 @@ int main(int argc, char *argv[]) {
         exit(0);
     }
 
-//    auto& source_stream = std::cin;
-//
-//    Logger::get_logger().reserve_thread_for_stdout();
-//    Logger::get_logger().add_threads_for_filewriters(num_file_threads);
-//    CommandProcessor processor(num_commands_in_bulk);
-//    processor.process_commands(source_stream);
-//
-//    Logger::get_logger().suspend_work(); // suspend all threads before printing statistics
-//    processor.print_statistics(std::cout);
-//    Logger::get_logger().print_statistics(std::cout);
+    Logger::get_logger().reserve_thread_for_stdout();
+    Logger::get_logger().add_threads_for_filewriters(num_file_threads);
 
     std::size_t bulk = 5;
     auto h = async::connect(bulk);

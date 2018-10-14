@@ -1,7 +1,18 @@
 #include <iostream>
 #include "command_processor.h"
 
-CommandProcessor::CommandProcessor(int num_commands_in_bulk_) : num_commands_in_bulk(num_commands_in_bulk_) {}
+//CommandProcessor::CommandProcessor(int num_commands_in_bulk_) : num_commands_in_bulk(num_commands_in_bulk_) {}
+
+void CommandProcessor::process_data(void* connection, const char *data, std::size_t size) {
+
+}
+
+void* CommandProcessor::create_connection(size_t bulk) {
+    return this;
+}
+
+void CommandProcessor::destroy_connection(void* connection) {
+}
 
 void CommandProcessor::process_commands(std::istream& source_stream) {
     std::string current_command;

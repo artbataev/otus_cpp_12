@@ -8,7 +8,16 @@
 
 class CommandProcessor {
 public:
-    explicit CommandProcessor(int num_commands_in_bulk_);
+//    explicit CommandProcessor(int num_commands_in_bulk_);
+    static CommandProcessor& get_processor() {
+        static CommandProcessor processor;
+        return processor;
+    }
+
+    void* create_connection(size_t bulk);
+    void destroy_connection(void* connection);
+
+    void process_data(void* connection, const char *data, std::size_t size);
 
     void process_commands(std::istream& source_stream);
 
