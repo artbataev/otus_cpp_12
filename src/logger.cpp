@@ -37,7 +37,8 @@ void Logger::add_threads_for_filewriters(int n) {
         filewriters_pool.emplace_back(std::thread([&] {
             this->task_runner(file_tasks_mutex, file_tasks_condition, file_tasks);
         }));
-        filewriters_pool_ids[filewriters_pool[num_file_threads + i].get_id()] = num_file_threads + i + 1; // file1, file2 etc.
+        filewriters_pool_ids[filewriters_pool[num_file_threads + i].get_id()] =
+                num_file_threads + i + 1; // file1, file2 etc.
     }
     num_file_threads += n;
 }
@@ -60,7 +61,7 @@ void Logger::log_to_cout(const std::string& content, size_t num_elements) {
 
 void Logger::log_to_file(const std::string& base_file_name, const std::string& content, size_t num_elements) {
     if (filewriters_pool.empty()) {
-        std::ofstream f(base_file_name + "-" + get_random_string(8)+ ".log");
+        std::ofstream f(base_file_name + "-" + get_random_string(8) + ".log");
         f << content;
         f.close();
     } else {
@@ -68,9 +69,9 @@ void Logger::log_to_file(const std::string& base_file_name, const std::string& c
             std::lock_guard<std::mutex> guard{file_tasks_mutex};
             file_tasks.push([&, base_file_name, content, num_elements] {
                 auto file_id = filewriters_pool_ids[std::this_thread::get_id()];
-                std::ofstream f(
-                        base_file_name + "-" + get_random_string(8) + "_" +
-                        std::to_string(file_id) + ".log");
+                std::string filename = base_file_name + "-" + get_random_string(8) + "_" +
+                                       std::to_string(file_id) + ".log";
+                std::ofstream f(filename);
                 f << content;
                 // some cpu-expensive work
                 /*
@@ -129,9 +130,9 @@ void Logger::resume_work() {
 }
 
 std::string Logger::get_random_string(int len) {
-    static const std::string alphanum = "0123456789abcdefghijklmnopqrstuvwxyz";
+    const std::string alphanum = "0123456789abcdefghijklmnopqrstuvwxyz";
     std::string result;
-    for(int i = 0; i < len; i++) {
+    for (int i = 0; i < len; i++) {
         result += alphanum[rand() % alphanum.size()];
     }
     return result;
