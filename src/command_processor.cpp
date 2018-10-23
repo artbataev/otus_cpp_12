@@ -4,9 +4,9 @@
 
 CommandProcessor::CommandProcessor(int num_commands_in_bulk_) : num_commands_in_bulk(num_commands_in_bulk_) {}
 
-void CommandProcessor::process_data(const std::string& data, std::size_t size) {
+void CommandProcessor::process_data(const std::string& data) {
     std::lock_guard<std::mutex> guard{data_mutex};
-    buffer.append(data, 0, size);
+    buffer.append(data);
     const auto last_newline_pos = buffer.rfind('\n');
 
     if (last_newline_pos != std::string::npos) {

@@ -54,7 +54,7 @@ namespace async::impl {
         if(handles.count(handle) > 0){
             auto processor = handles[handle];
             std::string data_str(data, size);
-            thread_pool.add_task([processor, data_str, size]{ processor->process_data(data_str, size); });
+            thread_pool.add_task([processor, data_str]{ processor->process_data(data_str); });
         }
     }
 

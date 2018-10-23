@@ -10,7 +10,7 @@ class CommandProcessor {
 public:
     explicit CommandProcessor(int num_commands_in_bulk_);
 
-    void process_data(const std::string& data, std::size_t size);
+    void process_data(const std::string& data);
 
     void process_commands(std::istream& source_stream, bool clear_after_end = true);
 
