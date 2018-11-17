@@ -1,12 +1,14 @@
 #include <sstream>
 #include <iostream>
 #include "server.h"
+#include "logger.h"
+#include "async.h"
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
     bool executed_correctly = true;
     std::stringstream whats_wrong;
 
-    int num_commands_in_bulk = 0;
+    size_t num_commands_in_bulk = 0;
     int port = 0;
 
     if (argc != 3) {
@@ -24,8 +26,8 @@ int main(int argc, char* argv[]) {
             whats_wrong << "Port must be a number";
         }
         try {
-            num_commands_in_bulk = std::stoi(argv[2]);
-            if (num_commands_in_bulk <= 0) {
+            num_commands_in_bulk = std::stoul(argv[2]);
+            if (num_commands_in_bulk == 0) {
                 whats_wrong << "Number of commands in bulk must be positive";
                 executed_correctly = false;
             }
@@ -41,6 +43,10 @@ int main(int argc, char* argv[]) {
         std::cout << argv[0] << " 9000 3" << std::endl;
         exit(0);
     }
+
+    Logger::get_logger().reserve_thread_for_stdout();
+    Logger::get_logger().add_threads_for_filewriters(2);
+    async::reserve_threads_for_tasks(2);
 
     Server server(port, num_commands_in_bulk);
     server.run();

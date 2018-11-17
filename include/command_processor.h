@@ -16,6 +16,8 @@ public:
 
     void print_statistics(std::ostream& output_stream);
 
+    ~CommandProcessor();
+
 private:
     void process_1_command(const std::string& command);
 

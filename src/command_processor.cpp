@@ -64,3 +64,9 @@ void CommandProcessor::print_statistics(std::ostream& output_stream) {
                   << total_commands << " commands, "
                   << total_blocks << " blocks" << std::endl;
 }
+
+CommandProcessor::~CommandProcessor() {
+    std::lock_guard<std::mutex> guard{data_mutex};
+    std::lock_guard<std::mutex> guard2{process_mutex};
+    accumulator.log_commands_and_clear();
+}
