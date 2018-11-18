@@ -2,7 +2,8 @@
 #include "async.h"
 #include "boost/asio.hpp"
 #include <iostream>
-
+#include "command_processor.h"
+#include <thread>
 
 namespace ba = boost::asio;
 
@@ -38,12 +39,15 @@ void AsyncProcessor::receive_and_process_loop(const boost::system::error_code& e
 }
 
 
-Server::Server(int port_, size_t num_commands_in_bulk_) :
+Server::Server(int port_, size_t num_commands_in_bulk_, size_t num_threads_) :
         port{port_},
         num_commands_in_bulk{num_commands_in_bulk_},
+        num_threads{num_threads_},
         server_endpoint{ba::ip::tcp::v4(), static_cast<unsigned short>(port_)},
         server_acceptor{server_service, server_endpoint},
-        server_socket{server_service} {}
+        server_socket{server_service} {
+    GlobalCommandProcessor::get_processor().set_bulk(static_cast<int>(num_commands_in_bulk_));
+}
 
 
 void Server::run() {
@@ -53,7 +57,13 @@ void Server::run() {
                 server_service.stop();
             });
     accept();
+
     server_service.run();
+    std::vector<std::thread> threads;
+    for(size_t i = 1; i < num_threads; i++)
+        threads.emplace_back([this](){ server_service.run(); });
+    for(auto& t: threads)
+        t.join();
 }
 
 

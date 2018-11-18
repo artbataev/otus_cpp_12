@@ -15,7 +15,7 @@ private:
     void receive_and_process_loop(const boost::system::error_code& ec, size_t size_read);
 
     ba::ip::tcp::socket client_socket;
-    char buffer_data[256];
+    char buffer_data[2];
     std::shared_ptr<AsyncProcessor> self;
     size_t num_commands_in_bulk;
     async::handle_t handle;
@@ -23,7 +23,7 @@ private:
 
 class Server {
 public:
-    explicit Server(int port_, size_t num_commands_in_bulk_);
+    explicit Server(int port_, size_t num_commands_in_bulk_, size_t num_threads_);
 
     void run();
 
@@ -33,6 +33,7 @@ public:
 private:
     int port;
     size_t num_commands_in_bulk;
+    size_t num_threads;
     ba::io_service server_service;
     ba::ip::tcp::endpoint server_endpoint;
     ba::ip::tcp::acceptor server_acceptor;

@@ -46,9 +46,9 @@ int main(int argc, char *argv[]) {
 
     Logger::get_logger().reserve_thread_for_stdout();
     Logger::get_logger().add_threads_for_filewriters(2);
-    async::reserve_threads_for_tasks(2);
+    async::reserve_threads_for_tasks(4);
 
-    Server server(port, num_commands_in_bulk);
+    Server server(port, num_commands_in_bulk, /*num_threads=*/1);
     server.run();
 
     return 0;

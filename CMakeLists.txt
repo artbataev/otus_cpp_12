@@ -43,13 +43,13 @@ target_link_libraries(bulk_server
         ${CMAKE_THREAD_LIBS_INIT}
         )
 
-configure_file(test/project_path.h.in project_path.h)
-find_package(GTest REQUIRED)
-add_executable(test_async test/test_bulk.cpp)
-target_link_libraries(test_async async logger command threadpool ${GTEST_LIBRARIES})
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    target_link_libraries(test_async pthread)
-endif ()
+#configure_file(test/project_path.h.in project_path.h)
+#find_package(GTest REQUIRED)
+#add_executable(test_async test/test_bulk.cpp)
+#target_link_libraries(test_async async logger command threadpool ${GTEST_LIBRARIES})
+#if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+#    target_link_libraries(test_async pthread)
+#endif ()
 
 install(TARGETS async LIBRARY DESTINATION lib)
 install(TARGETS bulk_server RUNTIME DESTINATION bin)
@@ -64,5 +64,5 @@ set(CPACK_PACKAGE_CONTACT artbataev@gmail.com)
 
 include(CPack)
 
-enable_testing()
+#enable_testing()
 #add_test(test test_async)
