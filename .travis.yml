@@ -8,6 +8,8 @@ addons:
     - ubuntu-toolchain-r-test
     packages:
     - g++-8
+    - libboost-dev
+    - libboost-system-dev
     - libgtest-dev
     - cmake
 
@@ -31,6 +33,6 @@ deploy:
   provider: script
   skip_cleanup: true
   script:
-  - curl -T async-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb -u artbataev:$BINTRAY_API_KEY "https://api.bintray.com/content/artbataev1/Otus_Assignments/Otus_Cpp_11/$TRAVIS_BUILD_NUMBER/async-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb;publish=1"
+  - curl -T bulk_server-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb -u artbataev:$BINTRAY_API_KEY "https://api.bintray.com/content/artbataev1/Otus_Assignments/Otus_Cpp_12/$TRAVIS_BUILD_NUMBER/bulk_server-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb;publish=1"
   on:
     branch: master
