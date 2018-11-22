@@ -14,6 +14,12 @@ void GlobalCommandProcessor::process_1_command(const std::string& current_comman
     }
 }
 
+void GlobalCommandProcessor::force_complete_bulk() {
+    if (accumulator.size() > 0) {
+        accumulator.log_commands_and_clear();
+    }
+}
+
 void GlobalCommandProcessor::set_bulk(int num_commands_in_bulk_) {
     num_commands_in_bulk = num_commands_in_bulk_;
 }
@@ -41,8 +47,9 @@ void CommandProcessor::process_data(const std::string& data) {
 
 void CommandProcessor::process_1_command(const std::string& current_command) {
     if (current_command == "{") {
-        if (num_brackets == 0)
-            accumulator.log_commands_and_clear();
+        if (num_brackets == 0) {
+            GlobalCommandProcessor::get_processor().force_complete_bulk(); // force complete global bulk
+        }
         num_brackets++;
     } else if (current_command == "}") {
         if (num_brackets <= 0) {
@@ -54,13 +61,9 @@ void CommandProcessor::process_1_command(const std::string& current_command) {
                 total_blocks++;
             }
         }
-    } else if (num_brackets > 0) { // normal command
+    } else if (num_brackets > 0) { // command in {...}
         accumulator.add_command(current_command);
         total_commands++;
-        if (num_brackets == 0 && accumulator.size() == num_commands_in_bulk) {
-            accumulator.log_commands_and_clear();
-            total_blocks++;
-        }
     } else { // num_brackets == 0, so redirect to global processor
         GlobalCommandProcessor::get_processor().process_1_command(current_command);
     }

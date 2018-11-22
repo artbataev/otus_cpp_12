@@ -19,6 +19,7 @@ public:
 
     void process_1_command(const std::string& command);
     void set_bulk(int num_commands_in_bulk_);
+    void force_complete_bulk();
 private:
     std::mutex data_mutex;
     int num_commands_in_bulk = 0;
